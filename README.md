@@ -7,7 +7,9 @@ Tanítás Google Colabban, magyar Piper-hangokkal (hu_HU, medium).
 |---|---|
 | `custom_microwakeword_training.ipynb` | az első „Minerva” modell notebookja (egy szó, cutoff 0,85) |
 | `minerva.tflite` | a régi „Minerva” modell – **túl érzékeny volt**, a dev lapon kikapcsolva (`select.dev_lap_ebreszto_szo_2` = no_wake_word) |
-| `he_minerva_training.ipynb` | **új: „Hé Minerva”** (2026-11-21) |
+| `he_minerva_training.ipynb` | **új: „Hé Minerva”** (2026-11-21) – Colab-változat |
+| `he_minerva.tflite`, `he_minerva.json` | **a kész „Hé Minerva” modell** (2026-11-21, GitHub Actions: dronesys/devagent-server `wakeword` workflow, kiadás `wakeword-he-minerva-10`, 20 000 lépés, angol TTS kiejtés-közelítéssel) |
+| `teszt/he_minerva_roc.txt` | tesztkimenet: téves elutasítás (frr) és téves ébredés/óra (faph) küszöbönként |
 
 ## Hé Minerva – mi változott a régihez képest
 - kétszavas kifejezés, `CLIP_DURATION_MS` 1800;
@@ -35,3 +37,8 @@ micro_wake_word:
 Privát tárolónál az URL-t az ESPHome nem éri el → helyi másolat a `/config/esphome/wakeword/` alá.
 Fordítás + OTA, majd HA: `select.dev_lap_ebreszto_szo_2` = „Hé Minerva”. Entitást nem nevezünk át.
 Ha még mindig érzékeny: `probability_cutoff` 0,98–0,99, `sliding_window_size` 8–10.
+
+## Tesztkimenet (wakeword-he-minerva-10)
+AUC 0,704. Küszöb 0,90: frr 22,9 %, faph 0,75/óra; 0,85: frr 20,7 %, faph 0,94/óra. A manifestben 0,97 (szigorúbb, kevesebb téves ébredés,
+több kihagyott kimondás). Ha sokszor nem ismeri fel: 0,93–0,95; ha még mindig ok nélkül ébred: 0,98–0,99 vagy sliding_window_size 8.
+Jobb modellhez: saját felvételek (`wakeword/sajat/` a devagent-serverben) és újrafuttatás.
